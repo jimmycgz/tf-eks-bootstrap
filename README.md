@@ -29,6 +29,9 @@ ln -s ../remote-state/remote-state-vpc.tf remote-state-vpc.tf
 
 ## References
 
+* All AWS Snippets from Hasicorp
+[Terraform AWS Provider](https://github.com/hashicorp/terraform-provider-aws)
+
 * [EKS cluster deployment using Terraform](
 https://sebinxavi.medium.com/eks-cluster-deployment-using-terraform-685c89b14f72)
 
