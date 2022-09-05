@@ -1,9 +1,9 @@
 # Provision AWS VPC from scratch
 
-## Using resource from scratch
-Refer to `vpc.tf`
+## Option-A: Using resource from scratch
+Find details at `vpc.tf`
 
-## Using module
+## Option-B: Using module
 Refer to : [AWS VPC Terraform module] (https://registry.terraform.io/modules/terraform-aws-modules/vpc/aws/3.14.3)
 
 Usage

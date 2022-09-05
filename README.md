@@ -18,11 +18,14 @@
 
 
 ## Incorperate generic config on each subfolder
+```
 ln -s ../variables.tf variables.tf
 ln -s ../terraform.auto.tfvars terraform.auto.tfvars
-
+```
 ## Use Remote state as data source on each subfolder
+```
 ln -s ../remote-state/remote-state-vpc.tf remote-state-vpc.tf
+```
 
 ## References
 
