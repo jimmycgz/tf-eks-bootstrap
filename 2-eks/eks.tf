@@ -20,31 +20,31 @@ module "eks" {
   source          = "terraform-aws-modules/eks/aws"
   cluster_name    = "my-eks"
   cluster_version = "1.21"
-  subnet_ids         = [data.terraform_remote_state.vpc.outputs.subnet-public1, data.terraform_remote_state.vpc.outputs.subnet-public2, data.terraform_remote_state.vpc.outputs.subnet-public3, data.terraform_remote_state.vpc.outputs.subnet-private1, data.terraform_remote_state.vpc.outputs.subnet-private2, data.terraform_remote_state.vpc.outputs.subnet-private3]
+  subnet_ids         = flatten([data.terraform_remote_state.vpc.outputs.subnets-public[*],data.terraform_remote_state.vpc.outputs.subnets-private[*]])
   vpc_id          = data.terraform_remote_state.vpc.outputs.aws-vpc
 
   self_managed_node_groups = {
     public = {
-      subnets          = [data.terraform_remote_state.vpc.outputs.subnet-public1, data.terraform_remote_state.vpc.outputs.subnet-public2, data.terraform_remote_state.vpc.outputs.subnet-public3]
+      subnets          = data.terraform_remote_state.vpc.outputs.subnets-public[*]
       desired_capacity = 1
       max_capacity     = 10
       min_capacity     = 1
 
       instance_type = var.instance_type
-      k8s_labels = {
+      k8s_labels = merge(var.generic_tags,{
         Environment = "public"
-      }
+      })
     }
     private = {
-      subnets          = [data.terraform_remote_state.vpc.outputs.subnet-private1, data.terraform_remote_state.vpc.outputs.subnet-private2, data.terraform_remote_state.vpc.outputs.subnet-private3]
+      subnets          = data.terraform_remote_state.vpc.outputs.subnets-private[*]
       desired_capacity = 2
       max_capacity     = 10
       min_capacity     = 1
 
       instance_type = var.instance_type
-      k8s_labels = {
+      k8s_labels = merge(var.generic_tags,{
         Environment = "private"
-      }
+      })
     }
   }
 

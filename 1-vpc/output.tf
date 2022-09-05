@@ -2,22 +2,20 @@
 output "aws-vpc" {
   value = aws_vpc.jmyvpc.id
 }
-output "subnet-private1" {
-  value = aws_subnet.private1.id
-}
-output "subnet-private2" {
-  value = aws_subnet.private2.id
-}
-output "subnet-private3" {
-  value = aws_subnet.private3.id
+
+output "subnets-private" {
+  value = aws_subnet.private-subnets[*].id
 }
 
-output "subnet-public1" {
-  value = aws_subnet.public1.id
+output "subnets-public" {
+  value = aws_subnet.public-subnets[*].id
 }
-output "subnet-public2" {
-  value = aws_subnet.public2.id
+
+/*
+locals {
+  my_num_list=[0,1,2,3,4,5]
 }
-output "subnet-public3" {
-  value = aws_subnet.public3.id
+output "subnet-azs" {
+  value=[for no in local.my_num_list:element(var.azs, no)]
 }
+*/

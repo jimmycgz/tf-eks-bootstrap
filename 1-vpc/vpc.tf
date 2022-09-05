@@ -28,99 +28,34 @@ resource "aws_internet_gateway" "igw" {
 
 
 # ---------------------------------------------------
-# Subnet myvpc-public-1
+# Subnets myvpc-public
 # ---------------------------------------------------
 
-resource "aws_subnet" "public1" {
-
+resource "aws_subnet" "public-subnets" {
+  count=3
   vpc_id                  = aws_vpc.jmyvpc.id
-  cidr_block              = var.public_subnets[0]
-  availability_zone       = var.azs[0]
+  cidr_block              = element(var.public_subnets,count.index)
+  availability_zone       = element(var.azs,count.index)
   map_public_ip_on_launch = true
   tags = merge(var.generic_tags, {
-    Name = "${var.project}-public1"
+    Name = format("%s-public-%d",var.project,count.index)
   })
 }
 
 # ---------------------------------------------------
-# Subent myvpc-public-2
+# Subnets myvpc-private
 # ---------------------------------------------------
 
-resource "aws_subnet" "public2" {
-
+resource "aws_subnet" "private-subnets" {
+  count=3
   vpc_id                  = aws_vpc.jmyvpc.id
-  cidr_block              = var.public_subnets[1]
-  availability_zone       = var.azs[1]
-  map_public_ip_on_launch = true
-  tags = merge(var.generic_tags, {
-    Name = "${var.project}-public2"
-  })
-}
-
-
-
-# ---------------------------------------------------
-# Subnet myvpc-public-3
-# ---------------------------------------------------
-
-resource "aws_subnet" "public3" {
-
-  vpc_id                  = aws_vpc.jmyvpc.id
-  cidr_block              = var.public_subnets[2]
-  availability_zone       = var.azs[2]
-  map_public_ip_on_launch = true
-  tags = merge(var.generic_tags, {
-    Name = "${var.project}-public3"
-  })
-}
-
-# ---------------------------------------------------
-# Subnet myvpc-private-1
-# ---------------------------------------------------
-
-resource "aws_subnet" "private1" {
-
-  vpc_id                  = aws_vpc.jmyvpc.id
-  cidr_block              = var.private_subnets[0]
-  availability_zone       = var.azs[0]
+  cidr_block              = element(var.private_subnets,count.index)
+  availability_zone       = element(var.azs,count.index)
   map_public_ip_on_launch = false
   tags = merge(var.generic_tags, {
-    Name = "${var.project}-private1"
+    Name = format("%s-private-%d",var.project, count.index)
   })
 }
-
-# ---------------------------------------------------
-# Subnet myvpc-private-2
-# ---------------------------------------------------
-
-resource "aws_subnet" "private2" {
-
-  vpc_id                  = aws_vpc.jmyvpc.id
-  cidr_block              = var.private_subnets[1]
-  availability_zone       = var.azs[1]
-  map_public_ip_on_launch = false
-  tags = merge(var.generic_tags, {
-    Name = "${var.project}-private2"
-  })
-}
-
-
-
-# ---------------------------------------------------
-# Subnet myvpc-private-3
-# ---------------------------------------------------
-
-resource "aws_subnet" "private3" {
-
-  vpc_id                  = aws_vpc.jmyvpc.id
-  cidr_block              = var.private_subnets[2]
-  availability_zone       = var.azs[2]
-  map_public_ip_on_launch = false
-  tags = merge(var.generic_tags, {
-    Name = "${var.project}-private3"
-  })
-}
-
 
 # ---------------------------------------------------
 # Creating Elastic Ip
@@ -141,7 +76,7 @@ resource "aws_eip" "nat" {
 resource "aws_nat_gateway" "nat" {
 
   allocation_id = aws_eip.nat.id
-  subnet_id     = aws_subnet.public3.id
+  subnet_id     = aws_subnet.public-subnets[2].id
 
   tags = merge(var.generic_tags, {
     Name = "${var.project}-nat"
@@ -187,58 +122,21 @@ resource "aws_route_table" "private" {
 
 
 # ---------------------------------------------------
-# Route table Association public1 subnet
+# Route table Association public subnets
 # ---------------------------------------------------
 
-resource "aws_route_table_association" "public1" {
-  subnet_id      = aws_subnet.public1.id
-  route_table_id = aws_route_table.public.id
-}
-
-
-# ---------------------------------------------------
-# Route table Association public2 subnet
-# ---------------------------------------------------
-
-resource "aws_route_table_association" "public2" {
-  subnet_id      = aws_subnet.public2.id
+resource "aws_route_table_association" "public" {
+  count=3
+  subnet_id      = aws_subnet.public-subnets[count.index].id
   route_table_id = aws_route_table.public.id
 }
 
 # ---------------------------------------------------
-# Route table Association public3 subnet
+# Route table Association private subnets
 # ---------------------------------------------------
 
-resource "aws_route_table_association" "public3" {
-  subnet_id      = aws_subnet.public3.id
-  route_table_id = aws_route_table.public.id
-}
-
-
-# ---------------------------------------------------
-# Route table Association private1 subnet
-# ---------------------------------------------------
-
-resource "aws_route_table_association" "private1" {
-  subnet_id      = aws_subnet.private1.id
-  route_table_id = aws_route_table.private.id
-}
-
-
-# ---------------------------------------------------
-# Route table Association private2 subnet
-# ---------------------------------------------------
-
-resource "aws_route_table_association" "private2" {
-  subnet_id      = aws_subnet.private2.id
-  route_table_id = aws_route_table.private.id
-}
-
-# ---------------------------------------------------
-# Route table Association private3 subnet
-# ---------------------------------------------------
-
-resource "aws_route_table_association" "private3" {
-  subnet_id      = aws_subnet.private3.id
+resource "aws_route_table_association" "private" {
+  count=3
+  subnet_id      = aws_subnet.private-subnets[count.index].id
   route_table_id = aws_route_table.private.id
 }
